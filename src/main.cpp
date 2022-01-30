@@ -1,5 +1,11 @@
 #include "main.h"
 
+QLength driveDiameter = 4_in;
+QLength driveOffset = 11.5_in;
+std::shared_ptr<ChassisController> drive = ChassisControllerBuilder()
+		.withMotors({1,2,3}, {4,5,6})
+		.withDimensions(AbstractMotor::gearset::green, {{driveDiameter, driveOffset}, imev5GreenTPR})
+		.build();;
 /**
  * A callback function for LLEMU's center button.
  *
@@ -27,6 +33,10 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
+	/*drive = ChassisControllerBuilder()
+		.withMotors({1,2,3}, {4,5,6})
+		.withDimensions(AbstractMotor::gearset::green, {{literals::_in(4), literals::_in(11)}, imev5GreenTPR})
+		.build();*/
 }
 
 /**
@@ -74,19 +84,5 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
-
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
-
-		left_mtr = left;
-		right_mtr = right;
-		pros::delay(20);
-	}
+	
 }
