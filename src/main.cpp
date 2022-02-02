@@ -1,8 +1,8 @@
-#include "main.h"
+#include "deviceDefinitions.h"
 
 QLength driveDiameter = 4_in;
 QLength driveOffset = 11.5_in;
-std::shared_ptr<ChassisController> drive = ChassisControllerBuilder()
+auto drive = ChassisControllerBuilder()
 		.withMotors({1,2,3}, {4,5,6})
 		.withDimensions(AbstractMotor::gearset::green, {{driveDiameter, driveOffset}, imev5GreenTPR})
 		.build();;
@@ -55,7 +55,17 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+	auto drive = ChassisControllerBuilder()
+		.withMotors(leftChassis, rightChassis)
+		.withDimensions(AbstractMotor::gearset::green, {{wheelDiameter, wheelTrack}, imev5GreenTPR})
+		.build();
+
+	auto liftCtrl = AsyncPosControllerBuilder()
+		.withMotor(bigLift)
+		.withGearset(AbstractMotor::gearset::red)
+		.build();
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -87,6 +97,23 @@ void opcontrol() {
 	Controller controller;
 	while(true){
 		drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
+		if(bigLiftUpButton.isPressed()){
+			bigLift.moveVelocity(100);
+		}
+		if(bigLiftUpButton.isPressed()){
+			bigLift.moveVelocity(-100);
+		}
+		if(conveyorUpButton.isPressed()){
+			conveyor.moveVelocity(100);
+		}
+		if(conveyorDownButton.isPressed()){
+			conveyor.moveVelocity(-100);
+		}
+		if(tilterDownButton.isPressed()){
+			tilter.set_value(true);
+		}
+		if(tilterUpButton.isPressed()){
+			tilter.set_value(false);
+		}
 	}
-	pros::delay(10);
 }
