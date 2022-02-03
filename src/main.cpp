@@ -1,11 +1,6 @@
 #include "deviceDefinitions.h"
 
-QLength driveDiameter = 4_in;
-QLength driveOffset = 11.5_in;
-auto drive = ChassisControllerBuilder()
-		.withMotors({1,2,3}, {4,5,6})
-		.withDimensions(AbstractMotor::gearset::green, {{driveDiameter, driveOffset}, imev5GreenTPR})
-		.build();;
+std::shared_ptr<ChassisController> drive = NULL;
 /**
  * A callback function for LLEMU's center button.
  *
@@ -33,10 +28,10 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
-	/*drive = ChassisControllerBuilder()
-		.withMotors({1,2,3}, {4,5,6})
-		.withDimensions(AbstractMotor::gearset::green, {{literals::_in(4), literals::_in(11)}, imev5GreenTPR})
-		.build();*/
+	drive = ChassisControllerBuilder()
+		.withMotors(leftChassis, rightChassis)
+		.withDimensions(AbstractMotor::gearset::green, {{wheelDiameter, wheelTrack}, imev5GreenTPR})
+		.build();
 }
 
 /**
@@ -56,15 +51,6 @@ void disabled() {}
  * starts.
  */
 void competition_initialize() {
-	auto drive = ChassisControllerBuilder()
-		.withMotors(leftChassis, rightChassis)
-		.withDimensions(AbstractMotor::gearset::green, {{wheelDiameter, wheelTrack}, imev5GreenTPR})
-		.build();
-
-	auto liftCtrl = AsyncPosControllerBuilder()
-		.withMotor(bigLift)
-		.withGearset(AbstractMotor::gearset::red)
-		.build();
 }
 
 /**
