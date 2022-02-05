@@ -1,5 +1,9 @@
-#pragma once
+#ifndef deviceDefinitions_H
+#define deviceDefinitions_H
+
 #include "main.h"
+using namespace okapi;
+extern int autonNumSelect;
 
 extern MotorGroup leftChassis;
 extern MotorGroup rightChassis;
@@ -26,3 +30,4 @@ extern ControllerButton tilterDownButton;
 extern ControllerButton tilterUpButton;
 extern ControllerButton clawActivateButton;
 
+#endif

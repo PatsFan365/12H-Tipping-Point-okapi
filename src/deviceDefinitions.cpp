@@ -1,5 +1,7 @@
 #include "deviceDefinitions.h"
 
+int autonNumSelect = -1;
+
 MotorGroup leftChassis  ({1,2,3});
 MotorGroup rightChassis ({4,5,6});
 

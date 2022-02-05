@@ -41,6 +41,8 @@
  */
 #include "okapi/api.hpp"
 #include "deviceDefinitions.h"
+#include "graphics.h"
+#include <string>
 //#include "pros/api_legacy.h"
 
 /**

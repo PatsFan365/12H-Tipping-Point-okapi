@@ -24,10 +24,6 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::lcd::register_btn1_cb(on_center_button);
 	drive = ChassisControllerBuilder()
 		.withMotors(leftChassis, rightChassis)
 		.withDimensions(AbstractMotor::gearset::green, {{wheelDiameter, wheelTrack}, imev5GreenTPR})
@@ -51,7 +47,9 @@ void disabled() {}
  * starts.
  */
 void competition_initialize() {
+	autonSelectScreen();
 }
+
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
