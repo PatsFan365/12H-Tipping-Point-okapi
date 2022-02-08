@@ -30,4 +30,8 @@ extern ControllerButton tilterDownButton;
 extern ControllerButton tilterUpButton;
 extern ControllerButton clawActivateButton;
 
+extern void initializeSystems();
+extern std::shared_ptr<OdomChassisController> drive;
+extern std::shared_ptr<AsyncPositionController<double,double>> lift;
+
 #endif

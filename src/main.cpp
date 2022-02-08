@@ -1,6 +1,5 @@
 #include "deviceDefinitions.h"
 
-std::shared_ptr<ChassisController> drive = NULL;
 /**
  * A callback function for LLEMU's center button.
  *
@@ -24,10 +23,7 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	drive = ChassisControllerBuilder()
-		.withMotors(leftChassis, rightChassis)
-		.withDimensions(AbstractMotor::gearset::green, {{wheelDiameter, wheelTrack}, imev5GreenTPR})
-		.build();
+	initializeSystems();
 }
 
 /**
