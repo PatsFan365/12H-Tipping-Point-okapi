@@ -58,7 +58,41 @@ void competition_initialize() {
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	while(!autonRan){
+		switch(autonNumSelect){
+			case 0:
+				autonRan = true;
+				rightAuton();
+				break;
+			case 1:
+				autonRan = true;
+				leftAuton();
+				break;
+			case 2:
+				autonRan = true;
+				halfWinPointRightAuton();
+				break;
+			case 3:
+				autonRan = true;
+				halfWinPointLeftAuton();
+				break;
+			case 4: 
+				autonRan = true;
+				winPointRight();
+				break;
+			case 5:
+				autonRan = true;
+				winPointLeft();
+				break;
+			case 6:
+				autonRan = true;
+				skills();
+				return;
+		}
+	}
+	exit(0);
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -74,26 +108,28 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	Controller controller;
 	while(true){
-		drive->getModel()->tank(controller.getAnalog(ControllerAnalog::leftY), controller.getAnalog(ControllerAnalog::rightY));
+		drive->getModel()->tank(mainCtrl.getAnalog(ControllerAnalog::leftY), mainCtrl.getAnalog(ControllerAnalog::rightY));
 		if(bigLiftUpButton.isPressed()){
-			bigLift.moveVelocity(100);
-		}
-		if(bigLiftUpButton.isPressed()){
-			bigLift.moveVelocity(-100);
-		}
-		if(conveyorUpButton.isPressed()){
+			bigLiftA.moveVelocity(100);
+		} else if (bigLiftDownButton.isPressed()){
+			bigLiftA.moveVelocity(-100);
+		} else {
+			bigLiftA.moveVelocity(0);
+			bigLiftA.setBrakeMode(AbstractMotor::brakeMode::hold);
+		} 
+		/*if(conveyorUpButton.isPressed()){
 			conveyor.moveVelocity(100);
 		}
 		if(conveyorDownButton.isPressed()){
 			conveyor.moveVelocity(-100);
-		}
-		if(tilterDownButton.isPressed()){
+		}*/
+		/*if(tilterDownButton.isPressed()){
 			tilter.set_value(true);
 		}
 		if(tilterUpButton.isPressed()){
 			tilter.set_value(false);
-		}
+		}*/
+		pros::delay(15);
 	}
 }

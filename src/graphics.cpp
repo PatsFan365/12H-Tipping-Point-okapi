@@ -2,12 +2,12 @@
 
 /*
 btn key
-0 = red right
-1 = red left
-2 = blue right
-3 = blue left
-4 = winpoint left
-5 = winpoint right
+0 = right
+1 = left
+2 = half win point right
+3 = half win point left
+4 = winpoint right
+5 = winpoint left
 6 = skills
 */
 
@@ -44,16 +44,16 @@ static lv_res_t btnClicked(lv_obj_t * btn){
         autonNumSelect = lv_obj_get_free_num(btn); // change current auton number
         switch(autonNumSelect) { //set auton name based on chosen button
             case 0:
-                currentAuton = "current auton: red right";
+                currentAuton = "current auton: right";
                 break;
             case 1:
-                currentAuton = "current auton: red left";
+                currentAuton = "current auton: left";
                 break;
             case 2:
-                currentAuton = "current auton: blue right";
+                currentAuton = "current auton: half win point right";
                 break;
             case 3:
-                currentAuton = "current auton: blue left";
+                currentAuton = "current auton: half winpoint left";
                 break;
             case 4:
                 currentAuton = "current auton: win-point right";
@@ -186,18 +186,18 @@ void autonSelectScreen(){
     skillsStyleReleased.body.radius = 0;
     skillsStyleReleased.text.color = LV_COLOR_MAKE(0, 0, 0);
 
-    redRightAutonBtn = createBtn(lv_scr_act(), 10, 50, 150, 83, 0, "Red Right");
+    redRightAutonBtn = createBtn(lv_scr_act(), 10, 50, 150, 83, 0, "Right");
     lv_btn_set_action(redRightAutonBtn, LV_BTN_ACTION_CLICK, btnClicked);
-    redLeftAutonBtn = createBtn(lv_scr_act(), 165, 50, 150, 83, 1, "Red Left");
+    redLeftAutonBtn = createBtn(lv_scr_act(), 165, 50, 150, 83, 1, "Left");
     lv_btn_set_action(redLeftAutonBtn, LV_BTN_ACTION_CLICK, btnClicked);
     skillsBtn = createBtn(lv_scr_act(), 320, 50, 150, 83, 6, "Skills");
     lv_btn_set_action(skillsBtn, LV_BTN_ACTION_CLICK, btnClicked);
-    blueRightAutonBtn = createBtn(lv_scr_act(), 10, 139, 109, 83, 2, "Blue Right");
+    blueRightAutonBtn = createBtn(lv_scr_act(), 10, 139, 109, 83, 2, "half WP Right");
     lv_btn_set_action(blueRightAutonBtn, LV_BTN_ACTION_CLICK, btnClicked);
-    blueLeftAutonBtn = createBtn(lv_scr_act(), 124, 139, 109, 83, 3, "Blue Left");
+    blueLeftAutonBtn = createBtn(lv_scr_act(), 124, 139, 109, 83, 3, "half WP Left");
     lv_btn_set_action(blueLeftAutonBtn, LV_BTN_ACTION_CLICK, btnClicked);
-    rightWinPointBtn = createBtn(lv_scr_act(), 241, 139, 109, 83, 4, "Right Win Point");
+    rightWinPointBtn = createBtn(lv_scr_act(), 241, 139, 109, 83, 4, "Right WP");
     lv_btn_set_action(rightWinPointBtn, LV_BTN_ACTION_CLICK, btnClicked);
-    leftWinPointBtn = createBtn(lv_scr_act(), 359, 139, 109, 83, 5, "Left Win Point");
+    leftWinPointBtn = createBtn(lv_scr_act(), 359, 139, 109, 83, 5, "Left WP");
     lv_btn_set_action(leftWinPointBtn, LV_BTN_ACTION_CLICK, btnClicked);
 }
