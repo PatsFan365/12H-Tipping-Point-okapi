@@ -11,7 +11,11 @@ void rightAuton(){
     7) lift standoffs to drag back
     8) drive backwards
     */
-   drive->driveToPoint({24_in, 0_in});
+   drive->setMaxVelocity(400);
+   drive->moveDistance(12_in);
+   pros::delay(2000);
+   drive->moveDistance(-20_in);
+   pros::delay(5000);
 }
 
 void leftAuton(){
@@ -25,6 +29,9 @@ void leftAuton(){
     7) lift standoffs to drag back
     8) drive backwards
     */
+   turnRightPIDTarget = 45;
+   turnRightDegreesPID();
+   pros::delay(10000);
 }
 
 void halfWinPointRightAuton(){

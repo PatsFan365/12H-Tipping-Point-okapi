@@ -1,4 +1,5 @@
-#include "deviceDefinitions.h"
+#include "main.h"
+#include <thread>
 
 /**
  * A callback function for LLEMU's center button.
@@ -16,6 +17,12 @@ void on_center_button() {
 	}
 }
 
+void odomTask(){
+	while(1){
+		printf("hi");
+		positionTracking();
+	}
+}
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -23,7 +30,17 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+	Logger::setDefaultLogger(
+    std::make_shared<Logger>(
+        TimeUtilFactory::createDefault().getTimer(), // It needs a Timer
+        "/ser/sout", // Output to the PROS terminal
+        Logger::LogLevel::error // Show errors and warnings
+    )
+);
 	initializeSystems();
+	leftTrackingWheel.reset();
+	rightTrackingWheel.reset();
+	inertial.reset();
 }
 
 /**
@@ -59,12 +76,16 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-	while(!autonRan){
+	pros::Task odom(odomTask);
+	bigLift.setBrakeMode(AbstractMotor::brakeMode::hold);
+	if(!autonRan){
 		switch(autonNumSelect){
 			case 0:
+			{
 				autonRan = true;
 				rightAuton();
 				break;
+			}
 			case 1:
 				autonRan = true;
 				leftAuton();
@@ -88,10 +109,19 @@ void autonomous() {
 			case 6:
 				autonRan = true;
 				skills();
-				return;
+				break;
 		}
 	}
-	exit(0);
+		/*printf("start\n");
+        printf("%.4lf\n", currentOrientation);
+        printf("%.4lf\n", deltaPosition);
+        printf("%4lf\n", position[0]);
+        printf("%4lf\n", position[1]);*/
+		rightAuton();
+	printf("auton end\n");
+	printf("%d\n", autonRan);
+	//odom.remove();
+	return;
 }
 
 /**
@@ -108,15 +138,16 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	//drive->setState({0_in, 0_in, 0_deg});
 	while(true){
 		drive->getModel()->tank(mainCtrl.getAnalog(ControllerAnalog::leftY), mainCtrl.getAnalog(ControllerAnalog::rightY));
 		if(bigLiftUpButton.isPressed()){
-			bigLiftA.moveVelocity(100);
+			bigLift.moveVelocity(100);
 		} else if (bigLiftDownButton.isPressed()){
-			bigLiftA.moveVelocity(-100);
+			bigLift.moveVelocity(-100);
 		} else {
-			bigLiftA.moveVelocity(0);
-			bigLiftA.setBrakeMode(AbstractMotor::brakeMode::hold);
+			bigLift.moveVelocity(0);
+			bigLift.setBrakeMode(AbstractMotor::brakeMode::hold);
 		} 
 		/*if(conveyorUpButton.isPressed()){
 			conveyor.moveVelocity(100);
@@ -130,6 +161,8 @@ void opcontrol() {
 		if(tilterUpButton.isPressed()){
 			tilter.set_value(false);
 		}*/
+		//printf(drive->getState().str().c_str());
+		printf("\n");
 		pros::delay(15);
 	}
 }

@@ -2,34 +2,50 @@
 
 int autonNumSelect = -1;
 bool autonRan = false;
+bool driveStraight = false;
+bool turnRightPIDRunning = false;
+bool turnLeftPIDRunning = false;
+bool drivePIDRunning = false;
+
+double turnRightPIDTarget;
+double turnLeftPIDTarget;
+double drivePIDTarget;
+double desiredSpeed;
 
 std::shared_ptr<OdomChassisController> drive;
 std::shared_ptr<AsyncPositionController<double, double>> lift;
 
-Motor leftBack(12);
-Motor leftFront(15);
-Motor rightFront(-13);
-Motor rightBack(-14);
+Motor leftBack(5);
+Motor leftFront(7);
+Motor leftMiddle(-20);
+Motor rightFront(-4);
+Motor rightBack(-2);
+Motor rightMiddle(3);
 
-MotorGroup leftChassis  ({leftFront, leftBack});
-MotorGroup rightChassis ({rightFront, rightBack});
+MotorGroup leftChassis  ({leftFront, leftMiddle, leftBack});
+MotorGroup rightChassis ({rightFront, rightMiddle, rightBack});
 
-Motor bigLiftLeft(2);
-Motor bigLiftRight(-19);
+//Motor bigLiftLeft(2);
+//Motor bigLiftRight(-19);
 
-MotorGroup bigLiftA({bigLiftLeft, bigLiftRight});
+Motor bigLift(1);
+
+//MotorGroup bigLiftA({bigLiftLeft, bigLiftRight});
 
 //Motor bigLift (7, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
 //Motor conveyor (8, true, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
 
-RotationSensor rightEncoder(10, false);
-RotationSensor leftEncoder(9, false);
+//RotationSensor rightEncoder(10, true);
+//RotationSensor leftEncoder(9, false);
 
-//RotationSensor rightTrackingWheel(9, false);
-//RotationSensor leftTrackingWheel(10, false);
+RotationSensor rightTrackingWheel(19, true);
+RotationSensor leftTrackingWheel(18, false);
 //RotationSensor sideTrackingWheel(11, false);
 
-//pros::ADIDigitalOut tilter('A');
+pros::ADIDigitalOut frontClaw('A');
+pros::ADIDigitalOut backClaw('A');
+
+pros::IMU inertial(14);
 
 Controller mainCtrl(ControllerId::master);
 ControllerButton bigLiftUpButton(ControllerDigital::R1);
@@ -42,24 +58,38 @@ ControllerButton bigLiftDownButton(ControllerDigital::R2);
 void initializeSystems(){
     drive = ChassisControllerBuilder()
     .withMotors(
-      {12, 15},
-      {13, 14}
+        {-5,-7,20}, //left
+        {4,2,-3} //right
     )
+    /*.withMotors(
+      {12, 15},
+      {-13, -14}
+    )*/
     .withSensors(
+        rightTrackingWheel,
+        leftTrackingWheel
+    )
+    /*.withSensors(
         rightEncoder,
         leftEncoder
-    )
+    )*/
     .withGains(
-        {.5, 0.0, 0.0}, //drive
-        {.001, 0.0, 0.0}, //turn 
-        {.001, 0.0, 0.0} //angle
+        {0.0016, 0.0, 0.0}, //drive
+        {0.0005,0,0}, //turn
+        {0.0,0,0} //straight
     )
+    /*.withGains(
+        {.003, 0.0, 0.0002}, //drive
+        {0.0001, 0.0001, 0.000}, //turn 
+        {0, 0.0, 0.0} //angle
+    )*/
     // wheel size is 4.1797_in times 3/7 gear ratio
-    .withDimensions(AbstractMotor::gearset::green, {{4.0_in, 14.0_in}, imev5GreenTPR})
-    // .withDimensions(AbstractMotor::gearset::blue, {{1.7913_in, 10.6016_in}, imev5BlueTPR})
-    //.withOdometry({{2.5_in, 2.75_in}, 3600})
-    .withOdometry()
+    //.withDimensions(AbstractMotor::gearset::green, {{4.0_in, 14.0_in}, imev5GreenTPR})
+    .withDimensions({AbstractMotor::gearset::blue, (36.0/84.0)}, {{4.0_in, 14_in}, imev5BlueTPR})
+    .withOdometry({{2.75_in, 5_in}, 360})
+    //.withOdometry()
     .buildOdometry();
+    //.build();
     
     /*lift = AsyncPosControllerBuilder()
     .withMotor({2, -19})

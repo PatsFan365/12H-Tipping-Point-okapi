@@ -41,9 +41,13 @@
  */
 #include "okapi/api.hpp"
 #include "deviceDefinitions.h"
+#include "driveFunctions.h"
 #include "graphics.h"
 #include "autons.h"
+#include "odometry.h"
 #include <string>
+#include <vector>
+#include "math.h"
 //#include "pros/api_legacy.h"
 
 /**
