@@ -5,22 +5,33 @@ bool autonRan = false;
 bool driveStraight = false;
 bool turnRightPIDRunning = false;
 bool turnLeftPIDRunning = false;
-bool drivePIDRunning = false;
+bool turnRightEnd = false;
+bool turnLeftEnd = false;
+bool conveyorEnd = false;
+bool conveyorRunning = false;
+bool liftEnd = false;
+bool liftRunning = false;
+bool liftBottom = false;
+bool elevateIsRunning = false;
+bool elevateEnd = false;
+bool driveEnd = false;
+bool driveIsRunning = false;
 
 double turnRightPIDTarget;
 double turnLeftPIDTarget;
 double drivePIDTarget;
 double desiredSpeed;
+double liftTarget;
 
 std::shared_ptr<OdomChassisController> drive;
 std::shared_ptr<AsyncPositionController<double, double>> lift;
 
-Motor leftBack(5);
-Motor leftFront(7);
-Motor leftMiddle(-20);
-Motor rightFront(-4);
-Motor rightBack(-2);
-Motor rightMiddle(3);
+Motor leftBack(-5);
+Motor leftFront(-7);
+Motor leftMiddle(20);
+Motor rightFront(4);
+Motor rightBack(13);
+Motor rightMiddle(-3);
 
 MotorGroup leftChassis  ({leftFront, leftMiddle, leftBack});
 MotorGroup rightChassis ({rightFront, rightMiddle, rightBack});
@@ -28,12 +39,12 @@ MotorGroup rightChassis ({rightFront, rightMiddle, rightBack});
 //Motor bigLiftLeft(2);
 //Motor bigLiftRight(-19);
 
-Motor bigLift(1);
+Motor bigLift(11, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
 
 //MotorGroup bigLiftA({bigLiftLeft, bigLiftRight});
 
 //Motor bigLift (7, false, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
-//Motor conveyor (8, true, AbstractMotor::gearset::red, AbstractMotor::encoderUnits::degrees);
+Motor conveyor (12, true, AbstractMotor::gearset::blue, AbstractMotor::encoderUnits::rotations);
 
 //RotationSensor rightEncoder(10, true);
 //RotationSensor leftEncoder(9, false);
@@ -42,24 +53,26 @@ RotationSensor rightTrackingWheel(19, true);
 RotationSensor leftTrackingWheel(18, false);
 //RotationSensor sideTrackingWheel(11, false);
 
-pros::ADIDigitalOut frontClaw('A');
-pros::ADIDigitalOut backClaw('A');
+pros::ADIDigitalOut frontClaw1('D',true);
+pros::ADIDigitalOut frontClaw2('E', true);
+pros::ADIDigitalOut backClaw1('G', true);
+pros::ADIDigitalOut backClaw2('H', true);
 
-pros::IMU inertial(14);
+pros::IMU inertial(15);
 
 Controller mainCtrl(ControllerId::master);
 ControllerButton bigLiftUpButton(ControllerDigital::R1);
 ControllerButton bigLiftDownButton(ControllerDigital::R2);
-//ControllerButton conveyorUpButton(ControllerDigital::up);
-//ControllerButton conveyorDownButton(ControllerDigital::down);
-//ControllerButton tilterDownButton(ControllerDigital::R1);
-//ControllerButton tilterUpButton(ControllerDigital::R2);
+ControllerButton conveyorOnButton(ControllerDigital::up);
+ControllerButton conveyorForwardToggle(ControllerDigital::down);
+ControllerButton tilterButton(ControllerDigital::L2);
+ControllerButton frontClawButton(ControllerDigital::L1);
 
 void initializeSystems(){
     drive = ChassisControllerBuilder()
     .withMotors(
         {-5,-7,20}, //left
-        {4,2,-3} //right
+        {4,13,-3} //right
     )
     /*.withMotors(
       {12, 15},

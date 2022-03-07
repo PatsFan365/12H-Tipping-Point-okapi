@@ -56,7 +56,7 @@ static lv_res_t btnClicked(lv_obj_t * btn){
                 currentAuton = "current auton: half winpoint left";
                 break;
             case 4:
-                currentAuton = "current auton: win-point right";
+                currentAuton = "current auton: middle";
                 break;
             case 5:
                 currentAuton = "current auton: win-point left";
@@ -196,7 +196,7 @@ void autonSelectScreen(){
     lv_btn_set_action(blueRightAutonBtn, LV_BTN_ACTION_CLICK, btnClicked);
     blueLeftAutonBtn = createBtn(lv_scr_act(), 124, 139, 109, 83, 3, "half WP Left");
     lv_btn_set_action(blueLeftAutonBtn, LV_BTN_ACTION_CLICK, btnClicked);
-    rightWinPointBtn = createBtn(lv_scr_act(), 241, 139, 109, 83, 4, "Right WP");
+    rightWinPointBtn = createBtn(lv_scr_act(), 241, 139, 109, 83, 4, "middle");
     lv_btn_set_action(rightWinPointBtn, LV_BTN_ACTION_CLICK, btnClicked);
     leftWinPointBtn = createBtn(lv_scr_act(), 359, 139, 109, 83, 5, "Left WP");
     lv_btn_set_action(leftWinPointBtn, LV_BTN_ACTION_CLICK, btnClicked);

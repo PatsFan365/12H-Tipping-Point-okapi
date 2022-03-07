@@ -1,5 +1,4 @@
 #include "main.h"
-#include <thread>
 
 /**
  * A callback function for LLEMU's center button.
@@ -16,13 +15,20 @@ void on_center_button() {
 		pros::lcd::clear_line(2);
 	}
 }
+/*bool intakeToggle = false;
+void toggleIntakeFn() {
+    while(pros::Task::notify_take(true, TIMEOUT_MAX)) {
+        intakeToggle =!intakeToggle;
+        pros::delay(20);
+    }
+}*/
 
-void odomTask(){
+/*void odomTask(){
 	while(1){
 		printf("hi");
 		positionTracking();
 	}
-}
+}*/
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -34,13 +40,15 @@ void initialize() {
     std::make_shared<Logger>(
         TimeUtilFactory::createDefault().getTimer(), // It needs a Timer
         "/ser/sout", // Output to the PROS terminal
-        Logger::LogLevel::error // Show errors and warnings
+        Logger::LogLevel::info // Show errors and warnings
     )
 );
 	initializeSystems();
 	leftTrackingWheel.reset();
 	rightTrackingWheel.reset();
+	drive->setState({0_in, 0_in, 0_deg});
 	inertial.reset();
+	bigLift.tarePosition();
 }
 
 /**
@@ -76,7 +84,13 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-	pros::Task odom(odomTask);
+	//pros::Task odom(odomTask);
+	pros::Task pidTurnRight(turnRightDegreesPID);
+	pros::Task pidTurnLeft(turnLeftDegreesPID);
+	pros::Task conveyorMove(runConveyor);
+	pros::Task liftMove(moveFrontLift);
+	pros::Task elevating(elevate);
+	pros::Task moving(move);
 	bigLift.setBrakeMode(AbstractMotor::brakeMode::hold);
 	if(!autonRan){
 		switch(autonNumSelect){
@@ -100,7 +114,7 @@ void autonomous() {
 				break;
 			case 4: 
 				autonRan = true;
-				winPointRight();
+				middle();
 				break;
 			case 5:
 				autonRan = true;
@@ -117,7 +131,7 @@ void autonomous() {
         printf("%.4lf\n", deltaPosition);
         printf("%4lf\n", position[0]);
         printf("%4lf\n", position[1]);*/
-		rightAuton();
+		//rightAuton();
 	printf("auton end\n");
 	printf("%d\n", autonRan);
 	//odom.remove();
@@ -139,6 +153,20 @@ void autonomous() {
  */
 void opcontrol() {
 	//drive->setState({0_in, 0_in, 0_deg});
+	bool conveyorOnState = false;
+	bool conveyorIsOn = false;
+	int conveyorIsForward = 1;
+	bool tilterActive = true;
+	bool tilterState = false;
+	bool frontClawActive = true;
+	bool frontClawState = false;
+	turnRightEnd = true;
+	turnLeftEnd = true;
+	conveyorEnd = true;
+	liftEnd = true;
+	elevateEnd = true;
+	driveEnd = true;
+	//pros::Task intakeTask(toggleIntakeFn);
 	while(true){
 		drive->getModel()->tank(mainCtrl.getAnalog(ControllerAnalog::leftY), mainCtrl.getAnalog(ControllerAnalog::rightY));
 		if(bigLiftUpButton.isPressed()){
@@ -147,22 +175,56 @@ void opcontrol() {
 			bigLift.moveVelocity(-100);
 		} else {
 			bigLift.moveVelocity(0);
+			
 			bigLift.setBrakeMode(AbstractMotor::brakeMode::hold);
 		} 
-		/*if(conveyorUpButton.isPressed()){
-			conveyor.moveVelocity(100);
+		if(conveyorOnButton.isPressed() && !conveyorOnState){
+			conveyorIsOn = !conveyorIsOn;
 		}
-		if(conveyorDownButton.isPressed()){
-			conveyor.moveVelocity(-100);
-		}*/
-		/*if(tilterDownButton.isPressed()){
-			tilter.set_value(true);
+		if(conveyorForwardToggle.isPressed()){
+			conveyor.moveVelocity(-450);
+		} else if (conveyorIsOn){
+			conveyor.moveVelocity(450);
+		} else {
+			conveyor.moveVelocity(0);
 		}
-		if(tilterUpButton.isPressed()){
-			tilter.set_value(false);
+		/*if(conveyorOnButton.isPressed()) {
+			intakeTask.notify();
+		}
+			if(conveyorForwardToggle.isPressed()){
+				conveyor.moveVelocity(-600);
+			} else if(intakeToggle && !conveyorOnState) {
+				conveyor.moveVelocity(600);
+			} else {
+				conveyor.moveVelocity(0);
+			}*/
+		/*if(conveyorOnButton.isPressed() && !conveyorOnState){
+			if(conveyorIsOn){
+				conveyor.moveVelocity(0);
+				conveyorIsOn = false;
+			} else{
+				conveyor.moveVelocity(600);
+				conveyorIsOn = true;
+			}
+		}
+		else if (conveyorForwardToggle.isPressed()){
+			conveyor.moveVelocity(600);
+		} else if (conveyorIsOn == false){
+			conveyor.moveVelocity(0);
 		}*/
-		//printf(drive->getState().str().c_str());
-		printf("\n");
-		pros::delay(15);
+		if(tilterButton.isPressed() && !tilterState){
+			backClaw1.set_value(!tilterActive);
+			backClaw2.set_value(!tilterActive);
+			tilterActive = !tilterActive;
+		}
+		if(frontClawButton.isPressed() && !frontClawState){
+			frontClaw1.set_value(!frontClawActive);
+			frontClaw2.set_value(!frontClawActive);
+			frontClawActive = !frontClawActive;
+		}
+		conveyorOnState = conveyorOnButton.isPressed();
+		tilterState = tilterButton.isPressed();
+		frontClawState = frontClawButton.isPressed();
+		pros::delay(20);
 	}
 }
